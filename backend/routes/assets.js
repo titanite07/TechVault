@@ -44,6 +44,48 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Get analytics data
+router.get('/analytics', async (req, res) => {
+    try {
+        const totalAssets = await Asset.countDocuments();
+
+        // Count by type
+        const laptops = await Asset.countDocuments({ type: 'Laptop' });
+        const monitors = await Asset.countDocuments({ type: 'Monitor' });
+        const licenses = await Asset.countDocuments({ type: 'License' });
+
+        // Count by status
+        const available = await Asset.countDocuments({ status: 'Available' });
+        const assigned = await Asset.countDocuments({ status: 'Assigned' });
+        const maintenance = await Asset.countDocuments({ status: 'Maintenance' });
+
+        // Recent assets (last 5)
+        const recentAssets = await Asset.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .select('name type createdAt');
+
+        const analytics = {
+            total: totalAssets,
+            byType: {
+                Laptop: laptops,
+                Monitor: monitors,
+                License: licenses
+            },
+            byStatus: {
+                Available: available,
+                Assigned: assigned,
+                Maintenance: maintenance
+            },
+            recentAssets
+        };
+
+        res.json(analytics);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching analytics', error: error.message });
+    }
+});
+
 // Update asset
 router.put('/:id', async (req, res) => {
     try {

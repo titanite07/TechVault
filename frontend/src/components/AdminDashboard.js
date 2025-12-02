@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { QRCodeSVG } from 'qrcode.react';
+import { useNavigate } from 'react-router-dom';
 
 function AdminDashboard({ user, onLogout }) {
+    const navigate = useNavigate();
     const [assets, setAssets] = useState([]);
     const [newAsset, setNewAsset] = useState({
         name: '',
@@ -70,6 +73,9 @@ function AdminDashboard({ user, onLogout }) {
             <div className="dashboard-header">
                 <h1>📊 Admin Dashboard</h1>
                 <div className="user-info">
+                    <button className="btn btn-primary" onClick={() => navigate('/analytics')} style={{ marginRight: '10px' }}>
+                        📈 Analytics
+                    </button>
                     <span className="user-badge">👤 {user.username}</span>
                     <button className="btn btn-secondary" onClick={onLogout}>
                         Logout
@@ -164,6 +170,20 @@ function AdminDashboard({ user, onLogout }) {
                                     {asset.type}
                                 </span>
                                 <h3>{asset.name}</h3>
+
+                                <div className="qr-code-container">
+                                    <QRCodeSVG
+                                        value={JSON.stringify({
+                                            id: asset._id,
+                                            name: asset.name,
+                                            type: asset.type,
+                                            status: asset.status
+                                        })}
+                                        size={120}
+                                        level="M"
+                                    />
+                                </div>
+
                                 <div className="asset-info">
                                     <strong>Specifications:</strong> {asset.specifications}
                                 </div>

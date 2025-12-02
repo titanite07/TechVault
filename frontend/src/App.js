@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import EmployeeDashboard from './components/EmployeeDashboard';
+import Analytics from './components/Analytics';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -67,6 +68,14 @@ function App() {
                         element={
                             user && user.role === 'employee' ?
                                 <EmployeeDashboard user={user} onLogout={handleLogout} /> :
+                                <Navigate to="/login" />
+                        }
+                    />
+                    <Route
+                        path="/analytics"
+                        element={
+                            user ?
+                                <Analytics user={user} onLogout={handleLogout} /> :
                                 <Navigate to="/login" />
                         }
                     />
