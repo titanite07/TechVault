@@ -97,7 +97,12 @@ pipeline {
                     kubectl apply -f k8s/service.yaml
                     
                     Write-Host "Waiting for deployment to roll out..."
-                    kubectl rollout status deployment/techvault-deployment -n techvault --timeout=2m || Write-Host "Deployment is in progress..."
+                    try {
+                        kubectl rollout status deployment/techvault-deployment -n techvault --timeout=2m
+                        Write-Host "Deployment successful!"
+                    } catch {
+                        Write-Host "Deployment is still in progress..."
+                    }
                     
                     Write-Host "Current deployment status:"
                     kubectl get pods -n techvault
@@ -151,8 +156,13 @@ pipeline {
         failure {
             echo '❌ Pipeline failed. Please check the logs above.'
             powershell '''
-                Write-Host "Recent pod events:"
-                kubectl get events -n techvault --sort-by='.lastTimestamp' | Select-Object -Last 10
+                Write-Host "Attempting to get recent pod events..."
+                try {
+                    kubectl config use-context docker-desktop
+                    kubectl get events -n techvault --sort-by='.lastTimestamp' | Select-Object -Last 10
+                } catch {
+                    Write-Host "Could not retrieve events (kubectl may not be configured in Jenkins)"
+                }
             '''
         }
         always {
