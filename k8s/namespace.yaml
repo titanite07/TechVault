@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: techvault
+  labels:
+    name: techvault
+    environment: production
